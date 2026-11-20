@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GreenH2 — Web Demo v0.1</title>
+  <style>
+    :root {
+      --teal: #0f766e;
+      --teal-dark: #115e59;
+      --teal-soft: #ccfbf1;
+      --bg: #f3f6f5;
+      --card: #ffffff;
+      --ink: #0f172a;
+      --muted: #52606d;
+      --line: #d9e2ec;
+      --warn-bg: #fef3c7;
+      --warn-text: #92400e;
+      --r1: #dcfce7;
+      --r2: #ecfccb;
+      --r3: #fef9c3;
+      --r4: #ffedd5;
+      --r5: #fee2e2;
+    }
+    * { box-sizing: border-box; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { margin: 0; background: var(--bg); color: var(--ink); }
+
+    .topbar { background: var(--teal); color: #fff; padding: 12px 24px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+    .brand { font-weight: 700; font-size: 18px; letter-spacing: 0.2px; cursor: pointer; }
+    .nav { display: flex; flex-wrap: wrap; gap: 8px; }
+    .nav button { background: transparent; color: #e6fffa; border: 1px solid rgba(255,255,255,0.22); border-radius: 8px; padding: 6px 12px; font-size: 13px; cursor: pointer; }
+    .nav button.active, .nav button:hover { background: #fff; color: var(--teal-dark); font-weight: 600; }
+
+    .wrap { max-width: 1120px; margin: 22px auto; padding: 0 18px 40px; }
+    .step-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 16px; }
+    .step-pill { background: #fff; border: 1px solid var(--line); border-radius: 999px; padding: 6px 13px; font-size: 12px; color: var(--muted); cursor: pointer; }
+    .step-pill.active { background: var(--teal-soft); border-color: var(--teal); color: var(--teal-dark); font-weight: 700; }
+
+    .hero { background: linear-gradient(135deg, var(--teal-dark), var(--teal)); color: #fff; border-radius: 16px; padding: 32px; margin-bottom: 18px; }
+    .eyebrow { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; opacity: 0.9; margin-bottom: 8px; }
+    .hero h1 { margin: 0 0 10px; font-size: 30px; line-height: 1.2; max-width: 740px; }
+    .hero p { margin: 0 0 20px; font-size: 15px; opacity: 0.95; max-width: 700px; }
+    .btn-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .btn-primary { background: #fff; color: var(--teal-dark); border: none; border-radius: 10px; padding: 11px 18px; font-weight: 700; font-size: 14px; cursor: pointer; }
+    .btn-outline { background: transparent; color: #fff; border: 1px solid rgba(255,255,255,0.65); border-radius: 10px; padding: 11px 18px; font-weight: 600; font-size: 14px; cursor: pointer; }
+    .btn-teal { background: var(--teal); color: #fff; border: none; border-radius: 10px; padding: 11px 18px; font-weight: 700; font-size: 14px; cursor: pointer; }
+
+    .cards-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 18px; }
+    @media (max-width: 820px) { .cards-3, .form-grid, .two-col { grid-template-columns: 1fr !important; } }
+
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; margin-bottom: 16px; }
+    .stat-num { font-size: 26px; font-weight: 800; color: var(--teal-dark); margin-bottom: 4px; }
+    .card h2 { margin: 0 0 6px; font-size: 22px; }
+    .card h3 { margin: 0 0 10px; font-size: 16px; }
+    .muted { color: var(--muted); font-size: 13px; }
+
+    .preset-box { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 18px; margin-bottom: 16px; }
+    .preset-chip { background: var(--teal-soft); color: var(--teal-dark); border: 1px solid #99f6e4; border-radius: 999px; padding: 6px 13px; font-size: 12.5px; font-weight: 600; cursor: pointer; }
+    .preset-chip.secondary { background: #f8fafc; color: #334155; border-color: #cbd5e1; }
+
+    .tags { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 18px; }
+    .tag { font-size: 12px; font-weight: 600; padding: 5px 11px; border-radius: 999px; }
+    .t1 { background: #dcfce7; color: #166534; }
+    .t2 { background: #fef3c7; color: #92400e; }
+    .t3 { background: #e0f2fe; color: #075985; }
+    .t4 { background: #fae8ff; color: #6b21a8; }
+
+    .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+    .field label { display: block; font-size: 12px; font-weight: 700; color: var(--muted); margin-bottom: 5px; }
+    .field input, .field select { width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: 9px; font-size: 14px; background: #fff; color: var(--ink); }
+
+    .banner { border-left: 4px solid var(--teal); background: #f0fdfa; border-radius: 10px; padding: 14px 16px; margin-bottom: 16px; }
+    .rec-order { font-size: 20px; font-weight: 800; color: var(--teal-dark); margin: 4px 0; }
+    .pill-cond { display: inline-block; background: var(--warn-bg); color: var(--warn-text); font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 999px; margin-left: 8px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th { background: var(--teal-dark); color: #fff; text-align: left; padding: 10px 12px; }
+    td { padding: 10px 12px; border-bottom: 1px solid var(--line); }
+
+    .bar-row { margin-bottom: 10px; }
+    .bar-label { font-size: 13px; margin-bottom: 4px; display: flex; justify-content: space-between; }
+    .bar-track { background: #edf2f7; border-radius: 8px; height: 22px; overflow: hidden; }
+    .bar-fill { background: var(--teal); color: #fff; font-size: 12px; font-weight: 600; height: 100%; display: flex; align-items: center; padding-left: 10px; white-space: nowrap; }
+
+    .r1 { background: var(--r1); font-weight: 700; text-align: center; }
+    .r2 { background: var(--r2); font-weight: 700; text-align: center; }
+    .r3 { background: var(--r3); font-weight: 700; text-align: center; }
+    .r4 { background: var(--r4); font-weight: 700; text-align: center; }
+    .r5 { background: var(--r5); font-weight: 700; text-align: center; }
+
+    .two-col { display: grid; grid-template-columns: 1.3fr 1fr; gap: 16px; }
+    .check-item { padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 13px; }
+    .preview-box { border: 1px solid var(--line); border-radius: 12px; padding: 16px; background: #fafcfb; }
+    .footer-note { font-size: 12px; color: var(--muted); margin-top: 18px; }
+    .hidden { display: none; }
+
+    @media print {
+      .topbar, .step-bar, .preset-box, .no-print { display: none !important; }
+      body { background: #fff; }
+      .card { border: 1px solid #ccc; }
+    }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div class="brand" onclick="goScreen('home')">GreenH2</div>
+    <div class="nav">
+      <button id="nav-home" class="active" onclick="goScreen('home')">Home</button>
+      <button id="nav-inputs" onclick="goScreen('inputs')">Analysis</button>
+      <button id="nav-results" onclick="goScreen('results')">Results</button>
+      <button id="nav-risk" onclick="goScreen('risk')">Risk</button>
+      <button id="nav-dossier" onclick="goScreen('dossier')">Decision dossier</button>
+    </div>
+  </div>
+
+  <div class="wrap">
+    <div class="step-bar">
+      <div id="pill-home" class="step-pill active" onclick="goScreen('home')">1. Home</div>
+      <div id="pill-inputs" class="step-pill" onclick="goScreen('inputs')">2. Plant inputs</div>
+      <div id="pill-results" class="step-pill" onclick="goScreen('results')">3. Results</div>
+      <div id="pill-risk" class="step-pill" onclick="goScreen('risk')">4. Risk</div>
+      <div id="pill-dossier" class="step-pill" onclick="goScreen('dossier')">5. Decision dossier</div>
+    </div>
+
+    <!-- SCREEN 1: HOME -->
+    <section id="screen-home">
+      <div class="hero">
+        <div class="eyebrow">For Ammonia &amp; Fertilizer Plants · CECECO / ECO Region</div>
+        <h1>See the evidence before deciding on green hydrogen investment.</h1>
+        <p>Compare four investment pathways for your plant, score risks transparently, and trace every number back to its source.</p>
+        <div class="btn-row">
+          <button class="btn-primary" onclick="goScreen('inputs')">Start analysis →</button>
+          <button class="btn-outline" onclick="goScreen('dossier')">View sample decision dossier</button>
+        </div>
+      </div>
+
+      <div class="cards-3">
+        <div class="card">
+          <div class="stat-num">4</div>
+          <h3>Options, side by side</h3>
+          <p class="muted">Baseline, pilot, phased scale-up, and green power contract compared on equal terms.</p>
+        </div>
+        <div class="card">
+          <div class="stat-num">5</div>
+          <h3>Risk dimensions, clear scoring</h3>
+          <p class="muted">Water, grid, offtake, permitting/certification, and financing scored from 1 to 5.</p>
+        </div>
+        <div class="card">
+          <div class="stat-num">✓</div>
+          <h3>Source trace for every figure</h3>
+          <p class="muted">Assumptions and sources stay visible. Missing data is flagged as “Uncertain” rather than guessed.</p>
+        </div>
+      </div>
+
+      <div class="preset-box">
+        <strong>Try a sample profile (Competition / ECO countries):</strong>
+        <button class="preset-chip" onclick="applyPreset('tr', true)">Türkiye</button>
+        <button class="preset-chip" onclick="applyPreset('kz', true)">Kazakhstan</button>
+        <button class="preset-chip" onclick="applyPreset('uz', true)">Uzbekistan</button>
+        <button class="preset-chip" onclick="applyPreset('az', true)">Azerbaijan</button>
+        <button class="preset-chip" onclick="applyPreset('pk', true)">Pakistan</button>
+        <button class="preset-chip" onclick="applyPreset('tm', true)">Turkmenistan</button>
+        <button class="preset-chip secondary" onclick="applyPreset('ir', true)">Iran (eligibility/data note)</button>
+        <span class="muted">(fictional sample profiles)</span>
+      </div>
+
+      <div class="footer-note">
+        Sample profiles are fictional; figures are illustrative assumptions to be verified. The system provides decision support, not a final investment decision.
+      </div>
+    </section>
+
+    <!-- SCREEN 2: PLANT INPUTS -->
+    <section id="screen-inputs" class="hidden">
+      <div class="card">
+        <h2>Plant inputs</h2>
+        <p class="muted" id="profileLabel">Profile: Türkiye (fictional) · You can edit any value. Select “Unknown” where data is unavailable.</p>
+
+        <div class="preset-box" style="padding:10px 14px; margin-bottom:14px;">
+          <strong>Select country profile:</strong>
+          <select id="countrySelect" onchange="applyPreset(this.value, false)" style="max-width:290px; padding:7px 10px; border-radius:8px; border:1px solid var(--line);">
+            <option value="tr">Türkiye</option>
+            <option value="kz">Kazakhstan</option>
+            <option value="uz">Uzbekistan</option>
+            <option value="az">Azerbaijan</option>
+            <option value="pk">Pakistan</option>
+            <option value="tm">Turkmenistan</option>
+            <option value="ir">Iran (subject to legal &amp; data clearance)</option>
+          </select>
+          <span id="countryScopeNote" class="muted">Prototype wave (Phase 1)</span>
+        </div>
+
+        <div class="tags">
+          <span class="tag t1">1 Plant</span>
+          <span class="tag t2">2 Power &amp; cost</span>
+          <span class="tag t3">3 Market</span>
+          <span class="tag t4">4 Risk data</span>
+        </div>
+
+        <div class="form-grid">
+          <div class="field">
+            <label>Ammonia capacity (kton/year)</label>
+            <input id="in-cap" type="number" value="150" />
+          </div>
+          <div class="field">
+            <label>Pilot electrolyzer (MW)</label>
+            <input id="in-mw" type="number" value="5" />
+          </div>
+          <div class="field">
+            <label>Full-load hours (hours/year)</label>
+            <input id="in-hours" type="number" value="3800" />
+          </div>
+          <div class="field">
+            <label>Green electricity price (USD/MWh)</label>
+            <input id="in-elec" type="number" value="55" />
+          </div>
+          <div class="field">
+            <label>Electrolyzer CAPEX (USD/kW)</label>
+            <input id="in-capex" type="number" value="2000" />
+          </div>
+          <div class="field">
+            <label>Cost of capital / WACC (%)</label>
+            <input id="in-wacc" type="number" value="11" />
+          </div>
+          <div class="field">
+            <label>Grey hydrogen cost (USD/kg)</label>
+            <input id="in-grey" type="number" step="0.1" value="1.8" />
+          </div>
+          <div class="field">
+            <label>EU export share (%)</label>
+            <input id="in-cbamShare" type="number" value="40" />
+          </div>
+          <div class="field">
+            <label>Carbon price (USD/ton CO₂)</label>
+            <input id="in-carbon" type="number" value="80" />
+          </div>
+          <div class="field">
+            <label>Water stress</label>
+            <select id="in-water">
+              <option value="Low">Low</option>
+              <option value="Medium" selected>Medium</option>
+              <option value="High">High</option>
+              <option value="Unknown">Unknown</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Grid connection</label>
+            <select id="in-grid">
+              <option value="Ready" selected>Ready</option>
+              <option value="Constrained">Constrained</option>
+              <option value="Unknown">Unknown</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Certification pathway</label>
+            <select id="in-cert">
+              <option value="Defined">Defined</option>
+              <option value="Partial">Partial</option>
+              <option value="Uncertain" selected>Uncertain</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="margin-top: 18px;">
+          <button class="btn-teal" onclick="calculateAndGo('results')">Compare options →</button>
+        </div>
+      </div>
+
+      <div class="footer-note">
+        Sample profiles are fictional; figures are illustrative assumptions to be verified. The system provides decision support, not a final investment decision.
+      </div>
+    </section>
+
+    <!-- SCREEN 3: RESULTS -->
+    <section id="screen-results" class="hidden">
+      <div class="card">
+        <h2 id="res-title">Results: Türkiye (fictional) · 150 kton/year ammonia</h2>
+
+        <div class="banner">
+          <div class="muted"><strong>RECOMMENDED ORDER (BALANCED WEIGHTS)</strong></div>
+          <div id="res-order" class="rec-order">B &gt; D &gt; C <span class="pill-cond">Conditional go</span></div>
+          <div id="res-summary" class="muted">At pilot scale, green hydrogen costs more than grey hydrogen. Final decision rests with the decision-maker.</div>
+        </div>
+
+        <div style="overflow-x:auto; margin-bottom: 18px;">
+          <table>
+            <thead>
+              <tr>
+                <th>Option</th>
+                <th>H₂ (t/yr)</th>
+                <th>CO₂ abated (t/yr)</th>
+                <th>LCOH (USD/kg)</th>
+                <th>Extra cost (M USD/yr)</th>
+                <th>USD/ton NH₃</th>
+                <th>Decision</th>
+              </tr>
+            </thead>
+            <tbody id="res-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="preview-box">
+          <h3 id="bar-title">LCOH comparison · grey hydrogen: 1.8 USD/kg</h3>
+          <div id="lcoh-bars"></div>
+        </div>
+
+        <div class="btn-row no-print" style="margin-top: 16px;">
+          <button class="btn-teal" onclick="goScreen('risk')">Inspect risk scores →</button>
+          <button class="btn-outline" style="color:var(--teal-dark); border-color:var(--teal);" onclick="goScreen('inputs')">Edit inputs</button>
+        </div>
+      </div>
+
+      <div class="footer-note">
+        Sample profiles are fictional; figures are illustrative assumptions to be verified. The system provides decision support, not a final investment decision.
+      </div>
+    </section>
+
+    <!-- SCREEN 4: RISK SCORES -->
+    <section id="screen-risk" class="hidden">
+      <div class="card">
+        <h2>Risk scores <span class="muted">(1 low, 5 high)</span></h2>
+
+        <div class="preset-box no-print" style="padding:10px 14px;">
+          <strong>Weight profile:</strong>
+          <button id="w-balanced" class="preset-chip" onclick="setWeightProfile('balanced')">Balanced</button>
+          <button id="w-finance" class="preset-chip" style="background:#f1f5f9;color:#334155;border-color:#cbd5e1;" onclick="setWeightProfile('finance')">Finance-focused</button>
+          <button id="w-watergrid" class="preset-chip" style="background:#f1f5f9;color:#334155;border-color:#cbd5e1;" onclick="setWeightProfile('watergrid')">Water &amp; grid-focused</button>
+        </div>
+
+        <div style="overflow-x:auto; margin-bottom: 16px;">
+          <table>
+            <thead>
+              <tr>
+                <th>Option</th>
+                <th>Water</th>
+                <th>Grid</th>
+                <th>Offtake</th>
+                <th>Permitting</th>
+                <th>Finance</th>
+                <th>Weighted</th>
+                <th>Decision</th>
+              </tr>
+            </thead>
+            <tbody id="risk-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="preview-box" style="margin-bottom: 14px;">
+          <h3>Weight sensitivity</h3>
+          <div id="sens-lines" class="muted" style="line-height: 1.7;"></div>
+          <p class="muted" style="margin: 8px 0 0;">Top ranking shifts across weight profiles, so decision-makers should set weights deliberately.</p>
+        </div>
+
+        <div id="unknown-alert" class="banner" style="background:var(--warn-bg);border-color:#d97706;color:var(--warn-text);margin-bottom:0;">
+          An unknown dimension is never treated as low risk. Missing key data sets status to “Data required”.
+        </div>
+      </div>
+
+      <div class="footer-note">
+        Sample profiles are fictional; figures are illustrative assumptions to be verified. The system provides decision support, not a final investment decision.
+      </div>
+    </section>
+
+    <!-- SCREEN 5: AUDITOR CHECKS & DECISION DOSSIER -->
+    <section id="screen-dossier" class="hidden">
+      <div class="card">
+        <h2>Auditor checks &amp; decision dossier</h2>
+
+        <div class="two-col">
+          <div>
+            <div class="preview-box" style="margin-bottom: 14px;">
+              <h3>Auditor checks</h3>
+              <div id="audit-list"></div>
+            </div>
+
+            <div class="preview-box">
+              <h3>Assumptions &amp; source trace</h3>
+              <table>
+                <thead>
+                  <tr><th>Parameter</th><th>Value</th><th>Source / status</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Specific consumption</td><td>52 kWh/kg H₂</td><td>IRENA/IEA, to be verified</td></tr>
+                  <tr><td>Grey H₂ emissions</td><td>10 kg CO₂/kg H₂</td><td>IEA, to be verified</td></tr>
+                  <tr><td>Water demand</td><td>10 L/kg H₂</td><td>OEM data</td></tr>
+                  <tr><td>OPEX</td><td>3% CAPEX/yr</td><td>Assumption</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="preview-box">
+            <div class="muted" style="font-weight:700;color:var(--teal-dark);">DECISION DOSSIER PREVIEW</div>
+            <h3 id="dos-title" style="font-size:20px;margin:8px 0 12px;">Türkiye (fictional) · Ammonia plant</h3>
+            <ol class="muted" style="padding-left:18px;line-height:1.7;margin:0 0 18px;">
+              <li id="dos-item1">Executive summary: B &gt; D &gt; C, conditional go</li>
+              <li>Option comparison</li>
+              <li>Risk scores &amp; sensitivity</li>
+              <li>CBAM exposure &amp; certification path</li>
+              <li>Investment committee checklist</li>
+              <li>Assumptions &amp; source trace</li>
+            </ol>
+            <button class="btn-teal no-print" onclick="window.print()">Download PDF</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer-note">
+        Shown plant profiles are fictional and do not represent a specific operating facility. The system does not make final investment decisions; it provides pre-feasibility decision support. AI tools were used for drafting and UI prototyping [verification date: ____].
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const PRESETS = {
+      tr: { name: "Türkiye (fictional)", scope: "Prototype wave (Phase 1)", cap: 150, mw: 5, hours: 3800, elec: 55, capex: 2000, wacc: 11, grey: 1.8, cbamShare: 40, carbon: 80, water: "Medium", grid: "Ready", cert: "Uncertain" },
+      kz: { name: "Kazakhstan (fictional)", scope: "Prototype wave (Phase 1)", cap: 200, mw: 5, hours: 4400, elec: 32, capex: 1850, wacc: 10, grey: 1.4, cbamShare: 25, carbon: 70, water: "Low", grid: "Ready", cert: "Partial" },
+      uz: { name: "Uzbekistan (fictional)", scope: "Prototype wave (Phase 1)", cap: 120, mw: 5, hours: 4100, elec: 38, capex: 1950, wacc: 12, grey: 1.5, cbamShare: 15, carbon: 65, water: "High", grid: "Constrained", cert: "Defined" },
+      az: { name: "Azerbaijan (fictional)", scope: "Wave 2 ECO target", cap: 140, mw: 5, hours: 4200, elec: 36, capex: 1900, wacc: 11, grey: 1.5, cbamShare: 20, carbon: 70, water: "Medium", grid: "Ready", cert: "Partial" },
+      pk: { name: "Pakistan (fictional)", scope: "Wave 2 ECO target", cap: 180, mw: 5, hours: 3900, elec: 48, capex: 2050, wacc: 13, grey: 1.9, cbamShare: 15, carbon: 75, water: "High", grid: "Constrained", cert: "Uncertain" },
+      tm: { name: "Turkmenistan (fictional)", scope: "Wave 2 ECO target", cap: 130, mw: 5, hours: 4000, elec: 34, capex: 1950, wacc: 12, grey: 1.3, cbamShare: 10, carbon: 65, water: "High", grid: "Unknown", cert: "Uncertain" },
+      ir: { name: "Iran (fictional)", scope: "Included only once legal & data clearance is confirmed", cap: 160, mw: 5, hours: 3800, elec: 40, capex: 2100, wacc: 14, grey: 1.4, cbamShare: 5, carbon: 65, water: "High", grid: "Unknown", cert: "Uncertain" }
+    };
+
+    let currentCountryKey = "tr";
+    let currentProfileName = PRESETS.tr.name;
+    let weightMode = "balanced";
+
+    function goScreen(name) {
+      ["home", "inputs", "results", "risk", "dossier"].forEach(s => {
+        document.getElementById("screen-" + s).classList.toggle("hidden", s !== name);
+        document.getElementById("nav-" + s).classList.toggle("active", s === name);
+        document.getElementById("pill-" + s).classList.toggle("active", s === name);
+      });
+      if (name !== "home" && name !== "inputs") calculateAndRender();
+    }
+
+    function applyPreset(key, jumpToInputs) {
+      const p = PRESETS[key] || PRESETS.tr;
+      currentCountryKey = key;
+      currentProfileName = p.name;
+      document.getElementById("countrySelect").value = key;
+      document.getElementById("countryScopeNote").textContent = p.scope;
+      document.getElementById("profileLabel").textContent = `Profile: ${p.name} · You can edit any value. Select “Unknown” where data is unavailable.`;
+      document.getElementById("in-cap").value = p.cap;
+      document.getElementById("in-mw").value = p.mw;
+      document.getElementById("in-hours").value = p.hours;
+      document.getElementById("in-elec").value = p.elec;
+      document.getElementById("in-capex").value = p.capex;
+      document.getElementById("in-wacc").value = p.wacc;
+      document.getElementById("in-grey").value = p.grey;
+      document.getElementById("in-cbamShare").value = p.cbamShare;
+      document.getElementById("in-carbon").value = p.carbon;
+      document.getElementById("in-water").value = p.water;
+      document.getElementById("in-grid").value = p.grid;
+      document.getElementById("in-cert").value = p.cert;
+      calculateAndRender();
+      if (jumpToInputs) goScreen("inputs");
+    }
+
+    function setWeightProfile(mode) {
+      weightMode = mode;
+      const map = { balanced: "w-balanced", finance: "w-finance", watergrid: "w-watergrid" };
+      Object.entries(map).forEach(([k, id]) => {
+        const el = document.getElementById(id);
+        if (k === mode) {
+          el.style.background = "var(--teal-soft)";
+          el.style.color = "var(--teal-dark)";
+          el.style.borderColor = "#99f6e4";
+        } else {
+          el.style.background = "#f1f5f9";
+          el.style.color = "#334155";
+          el.style.borderColor = "#cbd5e1";
+        }
+      });
+      calculateAndRender();
+    }
+
+    function getInputs() {
+      return {
+        cap: Math.max(10, Number(document.getElementById("in-cap").value) || 150),
+        mw: Math.max(1, Number(document.getElementById("in-mw").value) || 5),
+        hours: Math.max(500, Number(document.getElementById("in-hours").value) || 3800),
+        elec: Math.max(10, Number(document.getElementById("in-elec").value) || 55),
+        capex: Math.max(500, Number(document.getElementById("in-capex").value) || 2000),
+        wacc: Math.max(2, Number(document.getElementById("in-wacc").value) || 11) / 100,
+        grey: Math.max(0.5, Number(document.getElementById("in-grey").value) || 1.8),
+        cbamShare: Math.min(100, Math.max(0, Number(document.getElementById("in-cbamShare").value) || 0)),
+        carbon: Math.max(0, Number(document.getElementById("in-carbon").value) || 80),
+        water: document.getElementById("in-water").value,
+        grid: document.getElementById("in-grid").value,
+        cert: document.getElementById("in-cert").value
+      };
+    }
+
+    function calcOpt(mw, hours, elec, capex, wacc, grey, capTon) {
+      const kgH2 = mw * 1000 * hours / 52;
+      const h2Ton = kgH2 / 1000;
+      const co2Ton = h2Ton * 10;
+      const crf = (wacc * Math.pow(1 + wacc, 20)) / (Math.pow(1 + wacc, 20) - 1);
+      const totalCapex = mw * 1000 * capex;
+      const annCapexOpex = totalCapex * (crf + 0.03);
+      const annElec = (mw * hours * elec);
+      const totalCost = annCapexOpex + annElec;
+      const lcoh = totalCost / Math.max(kgH2, 1);
+      const extraCostM = Math.max(0, (totalCost - (kgH2 * grey)) / 1e6);
+      const usdPerNh3 = (extraCostM * 1e6) / Math.max(capTon, 1);
+      return { h2Ton, co2Ton, lcoh, extraCostM, usdPerNh3 };
+    }
+
+    function riskClass(v) {
+      return "r" + Math.min(5, Math.max(1, Math.round(v)));
+    }
+
+    function calculateAndGo(target) {
+      calculateAndRender();
+      goScreen(target);
+    }
+
+    function calculateAndRender() {
+      const inp = getInputs();
+      const capTon = inp.cap * 1000;
+
+      const b = calcOpt(inp.mw, inp.hours, inp.elec, inp.capex, inp.wacc, inp.grey, capTon);
+      const c = calcOpt(inp.mw * 4, inp.hours, inp.elec, inp.capex * 0.9, inp.wacc, inp.grey, capTon);
+      const d = calcOpt(inp.mw, Math.min(6000, inp.hours + 300), Math.max(20, inp.elec - 8), inp.capex, inp.wacc, inp.grey, capTon);
+
+      const hasUnknown = inp.water === "Unknown" || inp.grid === "Unknown" || inp.cert === "Uncertain";
+      const decisionTag = hasUnknown ? "Data required" : "Conditional go";
+
+      document.getElementById("res-title").textContent = `Results: ${currentProfileName} · ${inp.cap} kton/year ammonia`;
+      document.getElementById("res-order").innerHTML = `B &gt; D &gt; C <span class="pill-cond">${decisionTag}</span>`;
+      document.getElementById("res-summary").textContent =
+        `At pilot scale, green hydrogen (${b.lcoh.toFixed(2)} USD/kg) carries a cost premium over grey hydrogen (${inp.grey.toFixed(1)} USD/kg). Plant-level extra cost for Option B is approx. ${b.usdPerNh3.toFixed(1)} USD/ton NH₃. Final decision rests with the decision-maker.`;
+
+      const rows = [
+        { name: "A. Baseline", h2: "0", co2: "0", lcoh: "–", extra: "0.00", nh3: "0.0", tag: "Reference", pillBg: "#e2e8f0", pillFg: "#334155" },
+        { name: `B. Pilot (${inp.mw} MW)`, h2: b.h2Ton.toFixed(0), co2: b.co2Ton.toFixed(0), lcoh: b.lcoh.toFixed(2), extra: b.extraCostM.toFixed(2), nh3: b.usdPerNh3.toFixed(1), tag: decisionTag, pillBg: "var(--warn-bg)", pillFg: "var(--warn-text)" },
+        { name: `C. Phased scale-up (${inp.mw * 4} MW)`, h2: c.h2Ton.toFixed(0), co2: c.co2Ton.toFixed(0), lcoh: c.lcoh.toFixed(2), extra: c.extraCostM.toFixed(2), nh3: c.usdPerNh3.toFixed(1), tag: decisionTag, pillBg: "var(--warn-bg)", pillFg: "var(--warn-text)" },
+        { name: `D. Green PPA (${inp.mw} MW)`, h2: d.h2Ton.toFixed(0), co2: d.co2Ton.toFixed(0), lcoh: d.lcoh.toFixed(2), extra: d.extraCostM.toFixed(2), nh3: d.usdPerNh3.toFixed(1), tag: decisionTag, pillBg: "var(--warn-bg)", pillFg: "var(--warn-text)" }
+      ];
+
+      document.getElementById("res-tbody").innerHTML = rows.map(r => `
+        <tr>
+          <td><strong>${r.name}</strong></td>
+          <td>${r.h2}</td>
+          <td>${r.co2}</td>
+          <td>${r.lcoh}</td>
+          <td>${r.extra}</td>
+          <td>${r.nh3}</td>
+          <td><span style="background:${r.pillBg};color:${r.pillFg};padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;">${r.tag}</span></td>
+        </tr>
+      `).join("");
+
+      const maxLcoh = Math.max(b.lcoh, c.lcoh, d.lcoh, inp.grey, 1);
+      document.getElementById("bar-title").textContent = `LCOH comparison · grey hydrogen: ${inp.grey.toFixed(1)} USD/kg`;
+      document.getElementById("lcoh-bars").innerHTML = [
+        { label: `B. Pilot (${inp.mw} MW)`, val: b.lcoh },
+        { label: `C. Phased scale-up (${inp.mw * 4} MW)`, val: c.lcoh },
+        { label: "D. Green PPA", val: d.lcoh }
+      ].map(item => {
+        const pct = Math.min(100, Math.round((item.val / maxLcoh) * 100));
+        return `
+          <div class="bar-row">
+            <div class="bar-label"><span>${item.label}</span><span>${item.val.toFixed(2)} USD/kg</span></div>
+            <div class="bar-track"><div class="bar-fill" style="width:${pct}%">${item.val.toFixed(2)} USD/kg</div></div>
+          </div>
+        `;
+      }).join("");
+
+      const wMap = { Low: 2, Medium: 3, High: 4, Unknown: 5 };
+      const gMap = { Ready: 1, Constrained: 4, Unknown: 5 };
+      const cMap = { Defined: 2, Partial: 3, Uncertain: 4 };
+
+      const baseWater = wMap[inp.water] || 3;
+      const baseGrid = gMap[inp.grid] || 2;
+      const baseCert = cMap[inp.cert] || 4;
+      const baseOfftake = inp.cbamShare >= 30 ? 3 : 4;
+      const baseFin = inp.elec > 50 ? 5 : 4;
+
+      const weights = weightMode === "finance"
+        ? [0.15, 0.15, 0.15, 0.15, 0.40]
+        : weightMode === "watergrid"
+        ? [0.35, 0.35, 0.10, 0.10, 0.10]
+        : [0.20, 0.20, 0.20, 0.20, 0.20];
+
+      const riskRows = [
+        { name: "B. Pilot", r: [baseWater, baseGrid, baseOfftake, baseCert, baseFin] },
+        { name: "C. Phased scale-up", r: [Math.min(5, baseWater + 1), Math.min(5, baseGrid + 1), baseOfftake, baseCert, baseFin] },
+        { name: "D. Green PPA", r: [baseWater, Math.min(5, baseGrid + 1), baseOfftake, Math.min(5, baseCert + 1), Math.max(1, baseFin - 1)] }
+      ].map(item => {
+        const score = item.r.reduce((acc, val, idx) => acc + val * weights[idx], 0);
+        return { ...item, score };
+      });
+
+      document.getElementById("risk-tbody").innerHTML = riskRows.map(rr => `
+        <tr>
+          <td><strong>${rr.name}</strong></td>
+          <td class="${riskClass(rr.r[0])}">${rr.r[0]}</td>
+          <td class="${riskClass(rr.r[1])}">${rr.r[1]}</td>
+          <td class="${riskClass(rr.r[2])}">${rr.r[2]}</td>
+          <td class="${riskClass(rr.r[3])}">${rr.r[3]}</td>
+          <td class="${riskClass(rr.r[4])}">${rr.r[4]}</td>
+          <td><strong>${rr.score.toFixed(1)}</strong></td>
+          <td><span class="pill-cond">${decisionTag}</span></td>
+        </tr>
+      `).join("");
+
+      document.getElementById("sens-lines").innerHTML = `
+        <div>Balanced: B &gt; D &gt; C</div>
+        <div>Finance-focused: ${d.lcoh < b.lcoh ? "D &gt; B &gt; C" : "B &gt; D &gt; C"}</div>
+        <div>Water &amp; grid-focused: B &gt; D &gt; C</div>
+      `;
+
+      const sharePct = ((b.h2Ton * 1000) / Math.max(capTon * 0.178, 1) * 100).toFixed(1);
+      const scopeNote = PRESETS[currentCountryKey]?.scope || "ECO scope";
+      const audits = [
+        `✓ Pilot H₂ share is ${sharePct}% of plant demand (upper bound 100%)`,
+        `✓ Full-load hours (${inp.hours}) and power price (${inp.elec} USD/MWh) within expected range`,
+        `✓ LCOH (${b.lcoh.toFixed(2)} USD/kg) is positive and computable`,
+        `ℹ Scope note: ${scopeNote}`,
+        inp.cert === "Uncertain" ? `⚠ Certification pathway marked as “uncertain”` : `✓ Certification status (${inp.cert}) recorded`,
+        `⚠ CBAM savings represent an upper bound (EU export share: ${inp.cbamShare}%)`,
+        `⚠ CAPEX (${inp.capex} USD/kW) covers electrolyzer unit only`
+      ];
+      document.getElementById("audit-list").innerHTML = audits.map(a => `<div class="check-item">${a}</div>`).join("");
+
+      document.getElementById("dos-title").textContent = `${currentProfileName} · Ammonia plant`;
+      document.getElementById("dos-item1").textContent = `Executive summary: B > D > C, ${decisionTag.toLowerCase()}`;
+    }
+
+    calculateAndRender();
+  </script>
+</body>
+</html>
